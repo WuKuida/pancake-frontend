@@ -1,5 +1,30 @@
 [
   {
+    "constant": true,
+    "inputs": [],
+    "name": "getExponents",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "exponent0",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "exponent1",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint32",
+        "name": "blockTimestampLast",
+        "type": "uint32"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "anonymous": false,
     "inputs": [
       {

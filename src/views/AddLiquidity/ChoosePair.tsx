@@ -60,6 +60,7 @@ export function ChoosePair({
         </Box>
       </CardBody>
       <CardFooter>
+        <Text textAlign="center">恒定乘积公式 XY^0.75=K</Text>
         {!account ? (
           <ConnectWalletButton width="100%" />
         ) : (

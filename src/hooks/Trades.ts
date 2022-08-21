@@ -12,10 +12,15 @@ import {
   BETTER_TRADE_LESS_HOPS_THRESHOLD,
   ADDITIONAL_BASES,
 } from 'config/constants/exchange'
+import { Interface } from '@ethersproject/abi'
+import IPancakePairABI from 'config/abi/IPancakePair.json'
 import { PairState, usePairs } from './usePairs'
 import { wrappedCurrency } from '../utils/wrappedCurrency'
 
 import { useUnsupportedTokens, useWarningTokens } from './Tokens'
+import { useMultipleContractSingleData } from '../state/multicall/hooks'
+
+const PAIR_INTERFACE = new Interface(IPancakePairABI)
 
 export function useAllCommonPairs(currencyA?: Currency, currencyB?: Currency): Pair[] {
   const { chainId } = useActiveWeb3React()
@@ -72,8 +77,27 @@ export function useAllCommonPairs(currencyA?: Currency, currencyB?: Currency): P
     [tokenA, tokenB, bases, basePairs, chainId],
   )
 
-  const allPairs = usePairs(allPairCombinations)
-
+  const allPairs = usePairs(allPairCombinations).filter((result): result is [PairState.EXISTS, Pair] =>
+    Boolean(result[0] === PairState.EXISTS && result[1]),
+  )
+  const validPairAddresses = allPairs.map((result) => {
+    return Pair.getAddress(result[1].token0, result[1].token1)
+  })
+  const exponentsResult = useMultipleContractSingleData(validPairAddresses, PAIR_INTERFACE, 'getExponents')
+  exponentsResult.map((result, i) => {
+    const { result: exponents, loading } = result
+    if (loading) {
+      allPairs[i][1]?.setExponents('100', '100')
+      return null
+    }
+    if (!exponents) {
+      allPairs[i][1]?.setExponents('100', '100')
+      return null
+    }
+    const { exponent0, exponent1 } = exponents
+    allPairs[i][1]?.setExponents(exponent0.toString(), exponent1.toString())
+    return null
+  })
   // only pass along valid pairs, non-duplicated pairs
   return useMemo(
     () =>

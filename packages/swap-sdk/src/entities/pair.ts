@@ -20,6 +20,7 @@ import {
 import { sqrt, parseBigintIsh } from '../utils'
 import { InsufficientReservesError, InsufficientInputAmountError } from '../errors'
 import { Token } from './token'
+import { BigNumber } from '@ethersproject/bignumber'
 
 let PAIR_ADDRESS_CACHE: { [key: string]: string } = {}
 
@@ -28,6 +29,14 @@ const composeKey = (token0: Token, token1: Token) => `${token0.chainId}-${token0
 export class Pair {
   public readonly liquidityToken: Token
   private readonly tokenAmounts: [TokenAmount, TokenAmount]
+
+  public exponent0: String = '100'
+  public exponent1: String = '100'
+
+  public setExponents(_exponent0: String, _exponent1: String) {
+    this.exponent0 = _exponent0
+    this.exponent1 = _exponent1
+  }
 
   public static getAddress(tokenA: Token, tokenB: Token): string {
     const [token0, token1] = tokenA.sortsBefore(tokenB) ? [tokenA, tokenB] : [tokenB, tokenA] // does safety checks
@@ -44,7 +53,6 @@ export class Pair {
         ),
       }
     }
-
     return PAIR_ADDRESS_CACHE[key]
   }
 
@@ -121,6 +129,68 @@ export class Pair {
     return token.equals(this.token0) ? this.reserve0 : this.reserve1
   }
 
+  public exponentOf(token: Token): String {
+    invariant(this.involvesToken(token), 'TOKEN')
+    return token.equals(this.token0) ? this.exponent0 : this.exponent1
+  }
+
+  public floorSqrt(n: JSBI): JSBI {
+    if (JSBI.GT(n, 0)) {
+      let x: JSBI = JSBI.add(JSBI.divide(n, JSBI.BigInt(2)), JSBI.BigInt(1))
+      let y: JSBI = JSBI.divide(JSBI.add(x, JSBI.divide(n, x)), JSBI.BigInt(2))
+      while (JSBI.GT(x, y)) {
+        x = JSBI.add(y, JSBI.BigInt(0))
+        y = JSBI.divide(JSBI.add(x, JSBI.divide(n, x)), JSBI.BigInt(2))
+      }
+      return x
+    }
+    return JSBI.BigInt(0)
+  }
+
+  public floorCbrt(n: JSBI): JSBI {
+    let x: JSBI = JSBI.BigInt(0)
+    for (
+      let y = JSBI.exponentiate(JSBI.BigInt(2), JSBI.BigInt(255));
+      JSBI.GT(y, JSBI.BigInt(0));
+      y = JSBI.divide(y, JSBI.BigInt(8))
+    ) {
+      x = JSBI.multiply(x, JSBI.BigInt(2))
+      let z: JSBI = JSBI.add(
+        JSBI.multiply(JSBI.multiply(JSBI.BigInt(3), x), JSBI.add(x, JSBI.BigInt(1))),
+        JSBI.BigInt(1)
+      )
+      if (JSBI.GE(JSBI.divide(n, y), z)) {
+        n = JSBI.subtract(n, JSBI.multiply(y, z))
+        x = JSBI.add(x, JSBI.BigInt(1))
+      }
+    }
+    return x
+  }
+
+  public exp(n: JSBI, a: number, b: number, decimal: number): JSBI {
+    if (a == b) {
+      return n
+    }
+    a = a / 25
+    b = b / 25
+    n = JSBI.exponentiate(n, JSBI.BigInt(a))
+    if (b == 2) {
+      n = this.floorSqrt(n)
+    } else if (b == 3) {
+      n = this.floorCbrt(n)
+    } else if (b == 4) {
+      n = this.floorSqrt(this.floorSqrt(n))
+    }
+    if ((decimal * a) / b - decimal > 0) {
+      const bias = Math.round(10 ** ((decimal * a) / b - decimal))
+      return JSBI.divide(n, JSBI.BigInt(bias))
+    } else {
+      const bias = Math.round(1 / 10 ** ((decimal * a) / b - decimal))
+      return JSBI.multiply(n, JSBI.BigInt(bias))
+    }
+  }
+
+  // TODO 公式改了需要改这里！！！
   public getOutputAmount(inputAmount: TokenAmount): [TokenAmount, Pair] {
     invariant(this.involvesToken(inputAmount.token), 'TOKEN')
     if (JSBI.equal(this.reserve0.raw, ZERO) || JSBI.equal(this.reserve1.raw, ZERO)) {
@@ -128,19 +198,39 @@ export class Pair {
     }
     const inputReserve = this.reserveOf(inputAmount.token)
     const outputReserve = this.reserveOf(inputAmount.token.equals(this.token0) ? this.token1 : this.token0)
-    const inputAmountWithFee = JSBI.multiply(inputAmount.raw, FEES_NUMERATOR)
-    const numerator = JSBI.multiply(inputAmountWithFee, outputReserve.raw)
-    const denominator = JSBI.add(JSBI.multiply(inputReserve.raw, FEES_DENOMINATOR), inputAmountWithFee)
-    const outputAmount = new TokenAmount(
-      inputAmount.token.equals(this.token0) ? this.token1 : this.token0,
-      JSBI.divide(numerator, denominator)
+    const inputExponent = this.exponentOf(inputAmount.token)
+    const outputExponent = this.exponentOf(inputAmount.token.equals(this.token0) ? this.token1 : this.token0)
+    console.log('----------------------')
+    console.log('inputReserve:', JSBI.toNumber(inputReserve.raw))
+    console.log('outputReserve:', JSBI.toNumber(outputReserve.raw))
+    console.log('inputExponent:', inputExponent)
+    console.log('outputExponent:', outputExponent)
+    console.log('inputAmount', JSBI.toNumber(inputAmount.raw))
+    const inputAmountWithFee = JSBI.divide(JSBI.multiply(inputAmount.raw, FEES_NUMERATOR), FEES_DENOMINATOR)
+    const outputDecimals = inputAmount.token.equals(this.token0) ? this.token1.decimals : this.token0.decimals
+    const K = JSBI.multiply(
+      this.exp(inputReserve.raw, +inputExponent, 100, inputAmount.currency.decimals),
+      this.exp(outputReserve.raw, +outputExponent, 100, outputDecimals)
     )
-    if (JSBI.equal(outputAmount.raw, ZERO)) {
+    const X = this.exp(
+      JSBI.add(inputReserve.raw, inputAmountWithFee),
+      +inputExponent,
+      100,
+      inputAmount.currency.decimals
+    )
+    const tmp = this.exp(JSBI.divide(K, X), 100, +outputExponent, outputDecimals)
+    if (JSBI.LE(JSBI.BigInt(outputReserve.raw), tmp)) {
       throw new InsufficientInputAmountError()
     }
+    const outputAmount = new TokenAmount(
+      inputAmount.token.equals(this.token0) ? this.token1 : this.token0,
+      JSBI.subtract(JSBI.BigInt(outputReserve.raw), tmp)
+    )
+    console.log('result:', JSBI.toNumber(JSBI.subtract(JSBI.BigInt(outputReserve.raw), tmp)))
     return [outputAmount, new Pair(inputReserve.add(inputAmount), outputReserve.subtract(outputAmount))]
   }
 
+  // TODO 公式改了需要改这里！！！
   public getInputAmount(outputAmount: TokenAmount): [TokenAmount, Pair] {
     invariant(this.involvesToken(outputAmount.token), 'TOKEN')
     if (
@@ -153,11 +243,43 @@ export class Pair {
 
     const outputReserve = this.reserveOf(outputAmount.token)
     const inputReserve = this.reserveOf(outputAmount.token.equals(this.token0) ? this.token1 : this.token0)
-    const numerator = JSBI.multiply(JSBI.multiply(inputReserve.raw, outputAmount.raw), FEES_DENOMINATOR)
-    const denominator = JSBI.multiply(JSBI.subtract(outputReserve.raw, outputAmount.raw), FEES_NUMERATOR)
+    const outputExponent = this.exponentOf(outputAmount.token)
+    const inputExponent = this.exponentOf(outputAmount.token.equals(this.token0) ? this.token1 : this.token0)
+    console.log('inputReserve:', JSBI.toNumber(inputReserve.raw))
+    console.log('outputReserve:', JSBI.toNumber(outputReserve.raw))
+    console.log('inputExponent:', inputExponent)
+    console.log('outputExponent:', outputExponent)
+    console.log('outputAmount', JSBI.toNumber(outputAmount.raw))
+    const inputDecimals = outputAmount.token.equals(this.token0) ? this.token1.decimals : this.token0.decimals
+    const K = JSBI.multiply(
+      this.exp(inputReserve.raw, +inputExponent, 100, inputDecimals),
+      this.exp(outputReserve.raw, +outputExponent, 100, outputAmount.token.decimals)
+    )
+    const Y = this.exp(
+      JSBI.subtract(outputReserve.raw, outputAmount.raw),
+      +outputExponent,
+      100,
+      outputAmount.currency.decimals
+    )
+    const tmp = this.exp(JSBI.divide(K, Y), 100, +inputExponent, inputDecimals)
+    if (JSBI.LE(tmp, JSBI.BigInt(inputReserve.raw))) {
+      throw new InsufficientInputAmountError()
+    }
     const inputAmount = new TokenAmount(
       outputAmount.token.equals(this.token0) ? this.token1 : this.token0,
-      JSBI.add(JSBI.divide(numerator, denominator), ONE)
+      JSBI.divide(
+        JSBI.multiply(JSBI.subtract(tmp, JSBI.BigInt(inputReserve.raw)), JSBI.BigInt(FEES_DENOMINATOR)),
+        FEES_NUMERATOR
+      )
+    )
+    console.log(
+      'result:',
+      JSBI.toNumber(
+        JSBI.divide(
+          JSBI.multiply(JSBI.subtract(tmp, JSBI.BigInt(inputReserve.raw)), JSBI.BigInt(FEES_DENOMINATOR)),
+          FEES_NUMERATOR
+        )
+      )
     )
     return [inputAmount, new Pair(inputReserve.add(inputAmount), outputReserve.subtract(outputAmount))]
   }

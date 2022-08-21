@@ -32,17 +32,25 @@ import { useTradeExactIn } from 'hooks/Trades'
 import tryParseAmount from 'utils/tryParseAmount'
 import { AppState, useAppDispatch } from '../index'
 import { useCurrencyBalances } from '../wallet/hooks'
-import { Field, typeInput } from './actions'
+import { OriginField, Field, typeInput } from './actions'
 
 export function useMintState(): AppState['mint'] {
   return useSelector<AppState, AppState['mint']>((state) => state.mint)
 }
 
 export function useMintActionHandlers(noLiquidity: boolean | undefined): {
+  onFieldPrice: (typedValue: string) => void
   onFieldAInput: (typedValue: string) => void
   onFieldBInput: (typedValue: string) => void
 } {
   const dispatch = useAppDispatch()
+
+  const onFieldPrice = useCallback(
+    (typedValue: string) => {
+      dispatch(typeInput({ field: Field.PRICE, typedValue, noLiquidity: noLiquidity === true }))
+    },
+    [dispatch, noLiquidity],
+  )
 
   const onFieldAInput = useCallback(
     (typedValue: string) => {
@@ -58,6 +66,7 @@ export function useMintActionHandlers(noLiquidity: boolean | undefined): {
   )
 
   return {
+    onFieldPrice,
     onFieldAInput,
     onFieldBInput,
   }
@@ -79,12 +88,13 @@ export function useDerivedMintInfo(
   poolTokenPercentage?: Percent
   error?: string
   addError?: string
+  myPrice?: string
 } {
   const { account, chainId } = useActiveWeb3React()
 
   const { t } = useTranslation()
 
-  const { independentField, typedValue, otherTypedValue } = useMintState()
+  const { independentField, typedValue, otherTypedValue, customPrice } = useMintState()
 
   const dependentField = independentField === Field.CURRENCY_A ? Field.CURRENCY_B : Field.CURRENCY_A
 
@@ -115,10 +125,38 @@ export function useDerivedMintInfo(
     [Field.CURRENCY_B]: balances[1],
   }
 
+  // 在这里监视了代币A和代币B的数量变化
+  // 一旦代币A/或者代币B的金额数量发生了变化，就会根据pair的价格，调整另一个代币的数量
+  // independentAmount: 修改的代币对应的数量
+  // dependentAmount： 依赖修改的代币，自动调节的另一个代币的数量
   // amounts
   const independentAmount: CurrencyAmount | undefined = tryParseAmount(typedValue, currencies[independentField])
   const dependentAmount: CurrencyAmount | undefined = useMemo(() => {
     if (noLiquidity) {
+      if (independentAmount && +customPrice * 1000000000 >= 1) {
+        const wrappedIndependentAmount = wrappedCurrencyAmount(independentAmount, chainId)
+        const [tokenA, tokenB] = [wrappedCurrency(currencyA, chainId), wrappedCurrency(currencyB, chainId)]
+        if (tokenA && tokenB && wrappedIndependentAmount) {
+          const dependentCurrency = dependentField === Field.CURRENCY_B ? currencyB : currencyA
+          const dependentTokenAmount =
+            dependentField === Field.CURRENCY_B
+              ? new TokenAmount(
+                  tokenB,
+                  wrappedIndependentAmount
+                    .multiply('3000000000')
+                    .divide('4')
+                    .multiply(+customPrice * 1000000000).quotient,
+                )
+              : new TokenAmount(
+                  tokenA,
+                  wrappedIndependentAmount
+                    .multiply('4000000000000000000000000000')
+                    .divide('3')
+                    .divide(+customPrice * 1000000000).quotient,
+                )
+          return dependentCurrency === ETHER ? CurrencyAmount.ether(dependentTokenAmount.raw) : dependentTokenAmount
+        }
+      }
       if (otherTypedValue && currencies[dependentField]) {
         return tryParseAmount(otherTypedValue, currencies[dependentField])
       }
@@ -139,15 +177,41 @@ export function useDerivedMintInfo(
       return undefined
     }
     return undefined
-  }, [noLiquidity, otherTypedValue, currencies, dependentField, independentAmount, currencyA, chainId, currencyB, pair])
+  }, [
+    noLiquidity,
+    otherTypedValue,
+    currencies,
+    dependentField,
+    independentAmount,
+    currencyA,
+    chainId,
+    currencyB,
+    pair,
+    customPrice,
+  ])
 
   const parsedAmounts: { [field in Field]: CurrencyAmount | undefined } = useMemo(
     () => ({
       [Field.CURRENCY_A]: independentField === Field.CURRENCY_A ? independentAmount : dependentAmount,
       [Field.CURRENCY_B]: independentField === Field.CURRENCY_A ? dependentAmount : independentAmount,
+      [Field.PRICE]: undefined,
     }),
     [dependentAmount, independentAmount, independentField],
   )
+
+  // 如果customPrice本身没有，且没有流动性，是用户自己填写的independentAmount和dependentAmount，则需要计算最终的价格保留6位有效数字
+  const myPrice = useMemo(() => {
+    if (noLiquidity) {
+      if (customPrice) {
+        return customPrice
+      }
+      const { [Field.CURRENCY_A]: currencyAAmount, [Field.CURRENCY_B]: currencyBAmount } = parsedAmounts
+      if (currencyAAmount && currencyBAmount) {
+        return currencyAAmount.divide(currencyBAmount).divide(4).multiply(3).toSignificant(6)
+      }
+    }
+    return undefined
+  }, [chainId, currencyA, noLiquidity, pair, parsedAmounts])
 
   const price = useMemo(() => {
     if (noLiquidity) {
@@ -232,6 +296,7 @@ export function useDerivedMintInfo(
     poolTokenPercentage,
     error,
     addError,
+    myPrice,
   }
 }
 
@@ -347,7 +412,7 @@ export function useZapIn({
     return isDependentAmountGreaterThanMaxAmount ? maxAmounts[dependentField] : _dependentAmount
   }, [isDependentAmountGreaterThanMaxAmount, maxAmounts, dependentField, _dependentAmount])
 
-  const parsedAmounts: { [field in Field]: CurrencyAmount | undefined } = useMemo(
+  const parsedAmounts: { [field in OriginField]: CurrencyAmount | undefined } = useMemo(
     () => ({
       [Field.CURRENCY_A]: !zapTokenCheckedA
         ? undefined
@@ -363,7 +428,7 @@ export function useZapIn({
     [dependentAmount, independentAmount, independentField, zapTokenCheckedA, zapTokenCheckedB],
   )
 
-  const wrappedParsedAmounts: { [field in Field]: TokenAmount | undefined } = useMemo(
+  const wrappedParsedAmounts: { [field in OriginField]: TokenAmount | undefined } = useMemo(
     () => ({
       [Field.CURRENCY_A]: wrappedCurrencyAmount(parsedAmounts[Field.CURRENCY_A], chainId),
       [Field.CURRENCY_B]: wrappedCurrencyAmount(parsedAmounts[Field.CURRENCY_B], chainId),
@@ -547,7 +612,7 @@ export function useZapIn({
 
   const priceSeverity = overLimitZapRatio || zapInEstimatedError ? 4 : priceImpact ? warningSeverity(priceImpact) : 0
 
-  const { onFieldAInput, onFieldBInput } = useMintActionHandlers(false)
+  const { onFieldPrice, onFieldAInput, onFieldBInput } = useMintActionHandlers(false)
 
   const maxZappableAmount = useMemo(
     () =>

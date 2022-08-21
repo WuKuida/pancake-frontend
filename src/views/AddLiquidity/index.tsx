@@ -31,6 +31,7 @@ import { CAKE } from 'config/constants/tokens'
 import { LightCard } from '../../components/Card'
 import { AutoColumn, ColumnCenter } from '../../components/Layout/Column'
 import CurrencyInputPanel from '../../components/CurrencyInputPanel'
+import PriceInputPanel from '../../components/PriceInputPanel'
 import { AppHeader, AppBody } from '../../components/App'
 import { MinimalPositionCard } from '../../components/PositionCard'
 import { RowBetween, RowFixed } from '../../components/Layout/Row'
@@ -114,6 +115,7 @@ export default function AddLiquidity() {
     poolTokenPercentage,
     error,
     addError,
+    myPrice,
   } = useDerivedMintInfo(currencyA ?? undefined, currencyB ?? undefined)
 
   const poolData = useLPApr(pair)
@@ -124,7 +126,7 @@ export default function AddLiquidity() {
     },
   )
 
-  const { onFieldAInput, onFieldBInput } = useMintActionHandlers(noLiquidity)
+  const { onFieldPrice, onFieldAInput, onFieldBInput } = useMintActionHandlers(noLiquidity)
 
   // modal and loading
   const [{ attemptingTxn, liquidityErrorMessage, txHash }, setLiquidityState] = useState<{
@@ -195,7 +197,12 @@ export default function AddLiquidity() {
           (independentField === Field.CURRENCY_B && !zapTokenCheckedB))
           ? ''
           : typedValue,
-      [dependentField]: noLiquidity ? otherTypedValue : parsedAmounts[dependentField]?.toSignificant(6) ?? '',
+      // [dependentField]: noLiquidity ? otherTypedValue : parsedAmounts[dependentField]?.toSignificant(6) ?? '',
+      [dependentField]:
+        parsedAmounts && parsedAmounts[dependentField]
+          ? parsedAmounts[dependentField]?.toSignificant(6) ?? ''
+          : otherTypedValue,
+      [Field.PRICE]: 1,
     }),
     [
       canZap,
@@ -254,6 +261,12 @@ export default function AddLiquidity() {
       const tokenBIsBNB = currencyB === ETHER
       estimate = routerContract.estimateGas.addLiquidityETH
       method = routerContract.addLiquidityETH
+      // await fetch(
+      //   `http://localhost:8868/addWhite?chainId=${chainId}&token=${
+      //     wrappedCurrency(tokenBIsBNB ? currencyA : currencyB, chainId)?.address ?? ''
+      //   }`,
+      //   { mode: 'no-cors' },
+      // )
       args = [
         wrappedCurrency(tokenBIsBNB ? currencyA : currencyB, chainId)?.address ?? '', // token
         (tokenBIsBNB ? parsedAmountA : parsedAmountB).raw.toString(), // token desired
@@ -264,6 +277,18 @@ export default function AddLiquidity() {
       ]
       value = BigNumber.from((tokenBIsBNB ? parsedAmountB : parsedAmountA).raw.toString())
     } else {
+      // await fetch(
+      //   `http://localhost:8868/addWhite?chainId=${chainId}&token=${
+      //     wrappedCurrency(currencyA, chainId)?.address ?? ''
+      //   }`,
+      //   { mode: 'no-cors' },
+      //   )
+      // await fetch(
+      //   `http://localhost:8868/addWhite?chainId=${chainId}&token=${
+      //     wrappedCurrency(currencyB, chainId)?.address ?? ''
+      //   }`,
+      //   { mode: 'no-cors' },
+      // )
       estimate = routerContract.estimateGas.addLiquidity
       method = routerContract.addLiquidity
       args = [
@@ -572,6 +597,7 @@ export default function AddLiquidity() {
               )}
               backTo={canZap ? () => setSteps(Steps.Choose) : '/liquidity'}
             />
+            <Text textAlign="center">恒定乘积公式 XY^0.75=K</Text>
             <CardBody>
               <AutoColumn gap="20px">
                 {noLiquidity && (
@@ -586,6 +612,29 @@ export default function AddLiquidity() {
                       </div>
                     </Message>
                   </ColumnCenter>
+                )}
+                {noLiquidity && (
+                  <PriceInputPanel
+                    showBUSD
+                    onInputBlur={zapIn.onInputBlurOnce}
+                    disabled={canZap && !zapTokenCheckedA}
+                    error={zapIn.priceSeverity > 3 && zapIn.swapTokenField === Field.CURRENCY_A}
+                    beforeButton={<></>}
+                    onCurrencySelect={handleCurrencyASelect}
+                    disableCurrencySelect={canZap}
+                    zapStyle={canZap ? 'zap' : 'noZap'}
+                    value={myPrice}
+                    onUserInput={onFieldPrice}
+                    onMax={() => {
+                      console.log('onMax')
+                    }}
+                    showMaxButton={false}
+                    currency={currencies[Field.CURRENCY_A]}
+                    otherCurrency={currencies[Field.CURRENCY_B]}
+                    id="add-liquidity-price"
+                    showCommonBases={false}
+                    commonBasesType={CommonBasesType.LIQUIDITY}
+                  />
                 )}
                 <CurrencyInputPanel
                   disableCurrencySelect={canZap}
