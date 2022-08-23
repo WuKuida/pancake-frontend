@@ -58,10 +58,12 @@ export function computeTradePriceBreakdown(trade?: Trade | null): {
   // remove lp fees from price impact
   const priceImpactWithoutFeeFraction = trade && realizedLPFee ? trade.priceImpact.subtract(realizedLPFee) : undefined
 
-  // the x*y=k impact
-  const priceImpactWithoutFeePercent = priceImpactWithoutFeeFraction
-    ? new Percent(priceImpactWithoutFeeFraction?.numerator, priceImpactWithoutFeeFraction?.denominator)
-    : undefined
+  // the x*y=k impact, 这里的计算不准了，就不要了
+  // const priceImpactWithoutFeePercent = priceImpactWithoutFeeFraction
+  //   ? new Percent(priceImpactWithoutFeeFraction?.numerator, priceImpactWithoutFeeFraction?.denominator)
+  //   : undefined
+
+  const priceImpactWithoutFeePercent = new Percent(4, 1000)
 
   // the amount of the input that accrues to LPs
   const realizedLPFeeAmount =
