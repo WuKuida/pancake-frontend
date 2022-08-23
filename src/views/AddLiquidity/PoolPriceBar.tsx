@@ -21,7 +21,7 @@ function PoolPriceBar({
   return (
     <AutoColumn gap="md">
       <AutoRow justify="space-around" gap="4px">
-        <AutoColumn justify="center">
+        {/* <AutoColumn justify="center">
           <Text>{price?.toSignificant(6) ?? '-'}</Text>
           <Text fontSize="14px" pt={1}>
             {t('%assetA% per %assetB%', {
@@ -38,7 +38,7 @@ function PoolPriceBar({
               assetB: currencies[Field.CURRENCY_B]?.symbol ?? '',
             })}
           </Text>
-        </AutoColumn>
+        </AutoColumn> */}
         <AutoColumn justify="center">
           <Text>
             {noLiquidity && price
