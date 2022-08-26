@@ -206,7 +206,7 @@ export default function PriceInputPanel({
       <InputPanel>
         <Container as="label" zapStyle={zapStyle} error={error}>
           <LabelRow>
-            <Text>定价</Text>
+            <Text>定价 1{currency.symbol}=</Text>
             <NumericalInput
               error={error}
               disabled={disabled}

@@ -665,6 +665,7 @@ export default function AddLiquidity() {
                   id="add-liquidity-input-tokena"
                   showCommonBases
                   commonBasesType={CommonBasesType.LIQUIDITY}
+                  label="X"
                 />
                 <ColumnCenter>
                   <AddIcon width="16px" />
@@ -698,6 +699,7 @@ export default function AddLiquidity() {
                   id="add-liquidity-input-tokenb"
                   showCommonBases
                   commonBasesType={CommonBasesType.LIQUIDITY}
+                  label="Y"
                 />
 
                 {showZapWarning && (

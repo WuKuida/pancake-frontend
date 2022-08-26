@@ -40,6 +40,12 @@ export function ChoosePair({
           <Text textTransform="uppercase" color="secondary" bold small pb="24px">
             {t('Choose a valid pair')}
           </Text>
+          <FlexGap gap="35px">
+            <Text />
+            <Text>X(发行的代币）</Text>
+            <AddIcon color="textSubtle" />
+            <Text>Y(募集的代币）</Text>
+          </FlexGap>
           <FlexGap gap="4px">
             <CurrencySelect
               id="add-liquidity-select-tokena"

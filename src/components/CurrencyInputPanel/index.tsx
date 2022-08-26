@@ -209,6 +209,7 @@ export default function CurrencyInputPanel({
             fontSize="14px"
             style={{ display: 'inline', cursor: 'pointer' }}
           >
+            {/* TODO 如果要改展示的精度就在这里改！！！ */}
             {!hideBalance && !!currency
               ? t('Balance: %balance%', { balance: selectedCurrencyBalance?.toSignificant(6) ?? t('Loading') })
               : ' -'}
@@ -218,6 +219,7 @@ export default function CurrencyInputPanel({
       <InputPanel>
         <Container as="label" zapStyle={zapStyle} error={error}>
           <LabelRow>
+            <Text>{label === 'X' ? 'X（发行的代币）' : label === 'Y' ? 'Y（募集的代币）' : ''}</Text>
             <NumericalInput
               error={error}
               disabled={disabled}
