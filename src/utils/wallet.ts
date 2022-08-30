@@ -4,7 +4,7 @@ import { ExternalProvider } from '@ethersproject/providers'
 import { ChainId } from '@pancakeswap/sdk'
 import { BAD_SRCS } from 'components/Logo/Logo'
 import { BASE_BSC_SCAN_URLS } from 'config'
-import { BSC_RPC_URLS, BSC_TESTNET_RPC_URLS } from '../config/constants/rpc'
+import { BSC_RPC_URLS, BSC_TESTNET_RPC_URLS, ETH_RPC_URLS, RINKEBY_RPC_URLS } from '../config/constants/rpc'
 
 const NETWORK_CONFIG = {
   [ChainId.BSC]: {
@@ -16,6 +16,16 @@ const NETWORK_CONFIG = {
     name: 'BNB Smart Chain Testnet',
     scanURL: BASE_BSC_SCAN_URLS[ChainId.BSC_TESTNET],
     rpcUrls: BSC_TESTNET_RPC_URLS,
+  },
+  [ChainId.ETHEREUM]: {
+    name: 'Ethereum Mainnet',
+    scanURL: BASE_BSC_SCAN_URLS[ChainId.ETHEREUM],
+    rpcUrls: ETH_RPC_URLS,
+  },
+  [ChainId.RINKEBY]: {
+    name: 'Rinkeby Test Network',
+    scanURL: BASE_BSC_SCAN_URLS[ChainId.RINKEBY],
+    rpcUrls: RINKEBY_RPC_URLS,
   },
 }
 

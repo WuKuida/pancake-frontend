@@ -11,7 +11,7 @@ import { Web3Provider } from '@ethersproject/providers'
 
 const POLLING_INTERVAL = 12000
 
-const SUPPORTED_CHAIN_ID = [ChainId.BSC, ChainId.BSC_TESTNET]
+const SUPPORTED_CHAIN_ID = [ChainId.BSC, ChainId.BSC_TESTNET, ChainId.ETHEREUM, ChainId.RINKEBY]
 
 export const injected = new InjectedConnector({ supportedChainIds: SUPPORTED_CHAIN_ID })
 
@@ -19,6 +19,8 @@ const walletconnect = new WalletConnectConnector({
   rpc: {
     [ChainId.BSC]: 'https://bsc-dataseed.binance.org',
     [ChainId.BSC_TESTNET]: 'https://data-seed-prebsc-2-s3.binance.org:8545',
+    [ChainId.ETHEREUM]: 'https://eth-mainnet.alchemyapi.io/v2/_gg7wSSi0KMBsdKnGVfHDueq6xMB9EkC',
+    [ChainId.RINKEBY]: 'https://eth-rinkeby.alchemyapi.io/v2/_gg7wSSi0KMBsdKnGVfHDueq6xMB9EkC',
   },
   qrcode: true,
   pollingInterval: POLLING_INTERVAL,

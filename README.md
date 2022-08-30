@@ -23,11 +23,18 @@ addWhite：自动添加创建者到白名单中后台服务
 src/state/mint/hooks.ts: 监听流动性相关的数据变化，并进行响应
 src/state/mint/reducer.ts: 流动性相关的数据
 src/state/mint/actions.ts: 定义了action的结构
+src/utils/web3React.ts: 定义了节点信息 
 src/views/AddLiquidity/ChoosePair.tsx: 选择pair对时的界面
 src/views/AddLiquidity/index.tsx: 添加流动性时的界面
-packages/swap-sdk/src/constants.ts: 配置的常量，例如合约地址这些都在这里配置
+src/config/constants/exchange.ts: ROUTER_ADDRESS, 一些默认代币的地址,swap的中间代币
+packages/swap-sdk/src/constants.ts: 配置的常量，chainId，工厂合约地址这些都在这里配置
+packages/swap-sdk/src/entities/token.ts: 设置平台币
+packages/uikit/src/components/Image/tokens.ts：设置各类常用币
+packages/uikit/src/components/Image/index.stories.tsx: 设置币的logo
 packages/swap-sdk/src/entities/pair.ts： pair类，获取pair的代币余额，以及指数
+packages/swap-sdk/src/entities/currency.ts：定义了代币类，同时定义了平台币
 packages/swap-sdk/src/abis.IPancakePair.json： pair的abi
+pancake-frontend/src/config/constants/rpc.ts: 默认节点配置
 
 ### My_PRODUCT ADDRESS
 - WBNB:            0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c
@@ -41,13 +48,26 @@ packages/swap-sdk/src/abis.IPancakePair.json： pair的abi
 - INIT_CODE_HASH:  0x00fb7f630766e6a796048ea87d01acd3068e8ff67d078148a3fa3f4a84f69bd5
 - PancakeRouter:   0x10ed43c718714eb63d5aa57b78b54704e256024e
 
-### MyTEST
+### ETH_NEW_MAIN
+- WETH:            0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2
+- PancakeFactory:  0x1111111111111111111111111111111111111111
+- INIT_CODE_HASH:  0x2222222222222222222222222222222222222222222222222222222222222222
+- PancakeRouter:   0x3333333333333333333333333333333333333333
+
+### ETH_NEW_TEST
+- WETH:            0x9365BaEec608989AFA12ef7e62d4d7b0C03c72CE
+- PancakeFactory:  0xc8aAb8fE5680c1c2f086881cCF94Ffa98dc150aC
+- INIT_CODE_HASH:  0x00075d78cb1ca4b2632ca8a32768c14c4cbd888a52a43d2cbeaa3c074f91ea31
+- PancakeRouter:   0xa123Fe8b622BafE4f93FE6ca7497e5EE069c27d4
+
+### BSC_NEW_TEST
 - WBNB:            0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd
 - PancakeFactory:  0xCFA6a509902971897063C32a10Dad694608651d8
 - INIT_CODE_HASH:  0x00075d78cb1ca4b2632ca8a32768c14c4cbd888a52a43d2cbeaa3c074f91ea30
 - PancakeRouter:   0x6740f86B315A918f59221996f7Da430f027eDfe7
 
-### ORIGIN_TEST
+
+### BSC_OLD_TEST
 - WBNB:            0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd
 - PancakeFactory:  0x6725f303b657a9451d8ba641348b6761a6cc7a17
 - INIT_CODE_HASH:  0xd0d4c4cd0848c93cb4fd1f498d7013ee6bfb25783ea21593d5834f5d250ece66
@@ -98,6 +118,10 @@ yarn start
 10. 修改addWhite.py中的setter_address和setter_private_key，将其改成工厂合约的owner的地址和密钥
 11. 修改addWhite.py的node_url，改成自己的节点，当前节点后续会实效
 12. 部署添加白名单后台服务，记得打开8868端口，支持http/https的请求，并记录当前ip地址
+13. 修改currency.ts里面的平台币
+14.  TODO eth multiCall
+pancake-frontend/src/config/constants/contracts.ts
+pancake-frontend/packages/wagmi/src/chains.ts
 ```
 nohup python3 addWhite.py >/dev/null 2>&1 &
 ```

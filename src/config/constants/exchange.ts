@@ -1,11 +1,13 @@
 import { ChainId, JSBI, Percent, Token } from '@pancakeswap/sdk'
 import { BigNumber } from '@ethersproject/bignumber'
-import { bscTokens, bscTestnetTokens } from './tokens'
+import { bscTokens, bscTestnetTokens, ethTokens, rinkebyTokens } from './tokens'
 import { ChainTokenList } from './types'
 
 export const ROUTER_ADDRESS = {
   [ChainId.BSC]: '0x10ED43C718714eb63d5aA57B78B54704E256024E',
   [ChainId.BSC_TESTNET]: '0x6740f86B315A918f59221996f7Da430f027eDfe7',
+  [ChainId.ETHEREUM]: '0x3333333333333333333333333333333333333333',
+  [ChainId.RINKEBY]: '0xa123Fe8b622BafE4f93FE6ca7497e5EE069c27d4',
 }
 
 // used to construct intermediary pairs for trading
@@ -20,6 +22,8 @@ export const BASES_TO_CHECK_TRADES_AGAINST: ChainTokenList = {
     bscTokens.usdc,
   ],
   [ChainId.BSC_TESTNET]: [bscTestnetTokens.wbnb, bscTestnetTokens.cake, bscTestnetTokens.busd],
+  [ChainId.ETHEREUM]: [ethTokens.usdt],
+  [ChainId.RINKEBY]: [rinkebyTokens.usdt],
 }
 
 /**
@@ -43,12 +47,16 @@ export const CUSTOM_BASES: { [chainId in ChainId]?: { [tokenAddress: string]: To
 export const SUGGESTED_BASES: ChainTokenList = {
   [ChainId.BSC]: [bscTokens.busd, bscTokens.cake, bscTokens.btcb],
   [ChainId.BSC_TESTNET]: [bscTestnetTokens.wbnb, bscTestnetTokens.cake, bscTestnetTokens.busd],
+  [ChainId.ETHEREUM]: [ethTokens.usdt],
+  [ChainId.RINKEBY]: [rinkebyTokens.usdt],
 }
 
 // used to construct the list of all pairs we consider by default in the frontend
 export const BASES_TO_TRACK_LIQUIDITY_FOR: ChainTokenList = {
   [ChainId.BSC]: [bscTokens.wbnb, bscTokens.dai, bscTokens.busd, bscTokens.usdt],
   [ChainId.BSC_TESTNET]: [bscTestnetTokens.wbnb, bscTestnetTokens.cake, bscTestnetTokens.busd],
+  [ChainId.ETHEREUM]: [ethTokens.usdt],
+  [ChainId.RINKEBY]: [rinkebyTokens.usdt],
 }
 
 export const PINNED_PAIRS: { readonly [chainId in ChainId]?: [Token, Token][] } = {

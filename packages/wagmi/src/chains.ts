@@ -121,6 +121,51 @@ export const bscTest: Chain = {
     address: '0x8F3273Fb89B075b1645095ABaC6ed17B2d4Bc576',
     blockCreated: 9759845,
   },
+}
+
+// TODO wkd ！！！ eth multiCall
+export const eth: Chain = {
+  id: 1,
+  name: 'Ethereum Mainnet',
+  network: 'Ethereum Mainnet',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'ETH',
+    symbol: 'ETH',
+  },
+  rpcUrls: {
+    default: 'https://mainnet.infura.io/v3/',
+    public: 'https://mainnet.infura.io/v3/',
+  },
+  blockExplorers: {
+    default: { name: 'EthScan', url: 'https://etherscan.io' },
+  },
+  multicall: {
+    address: 'xxx',
+    blockCreated: 0,
+  },
+}
+
+export const ethTest: Chain = {
+  id: 4,
+  name: 'Rinkeby Test Network',
+  network: 'Rinkeby Test Network',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'ETH',
+    symbol: 'ETH',
+  },
+  rpcUrls: {
+    default: 'https://rinkeby.infura.io/v3/',
+    public: 'https://rinkeby.infura.io/v3/',
+  },
+  blockExplorers: {
+    default: { name: 'EthScan', url: 'https://rinkeby.etherscan.io' },
+  },
+  multicall: {
+    address: '0xE4E79F6a3C824C545BD5F026Aa9c0ac6261b711c',
+    blockCreated: 11287426,
+  },
   testnet: true,
 }
 

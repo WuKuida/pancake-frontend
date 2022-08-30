@@ -36,14 +36,37 @@ const USDC_TESTNET = new Token(
   'https://www.centre.io/usdc',
 )
 
+const USDT_ETH = new Token(
+  ChainId.ETHEREUM,
+  '0xdAC17F958D2ee523a2206206994597C13D831ec7',
+  18,
+  'USDT',
+  'Tether USD',
+  'https://tether.to/',
+)
+
+const USDT_RINKEBY = new Token(
+  ChainId.RINKEBY,
+  '0x045144F7532E498694d7Aae2d88E176c42c0ff97',
+  18,
+  'USDT',
+  'Tether USD',
+  'https://tether.to/',
+)
+
 export const USDC = {
   [ChainId.BSC]: USDC_BSC,
   [ChainId.BSC_TESTNET]: USDC_TESTNET,
+  [ChainId.ETHEREUM]: USDT_ETH,
+  [ChainId.RINKEBY]: USDT_RINKEBY,
 }
 
+// 作为添加流动性的默认pair对之一
 export const CAKE = {
   [ChainId.BSC]: CAKE_MAINNET,
   [ChainId.BSC_TESTNET]: CAKE_TESTNET,
+  [ChainId.ETHEREUM]: USDT_ETH,
+  [ChainId.RINKEBY]: USDT_RINKEBY,
 }
 
 const BUSD_MAINNET = new Token(
@@ -67,6 +90,8 @@ const BUSD_TESTNET = new Token(
 export const BUSD: Record<ChainId, Token> = {
   [ChainId.BSC]: BUSD_MAINNET,
   [ChainId.BSC_TESTNET]: BUSD_TESTNET,
+  [ChainId.ETHEREUM]: USDT_ETH,
+  [ChainId.RINKEBY]: USDT_RINKEBY,
 }
 
 export const bscTokens = {
@@ -2368,4 +2393,12 @@ export const bscTestnetTokens = {
     'Bakeryswap Token',
     'https://www.bakeryswap.org/',
   ),
+}
+
+export const ethTokens = {
+  usdt: USDT_ETH,
+}
+
+export const rinkebyTokens = {
+  usdt: USDT_RINKEBY,
 }

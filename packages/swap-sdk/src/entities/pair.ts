@@ -226,7 +226,7 @@ export class Pair {
       inputAmount.token.equals(this.token0) ? this.token1 : this.token0,
       JSBI.subtract(JSBI.BigInt(outputReserve.raw), tmp)
     )
-    console.log('result:', JSBI.toNumber(JSBI.subtract(JSBI.BigInt(outputReserve.raw), tmp)))
+    // console.log('result:', JSBI.toNumber(JSBI.subtract(JSBI.BigInt(outputReserve.raw), tmp)))
     return [outputAmount, new Pair(inputReserve.add(inputAmount), outputReserve.subtract(outputAmount))]
   }
 
@@ -245,11 +245,11 @@ export class Pair {
     const inputReserve = this.reserveOf(outputAmount.token.equals(this.token0) ? this.token1 : this.token0)
     const outputExponent = this.exponentOf(outputAmount.token)
     const inputExponent = this.exponentOf(outputAmount.token.equals(this.token0) ? this.token1 : this.token0)
-    console.log('inputReserve:', JSBI.toNumber(inputReserve.raw))
-    console.log('outputReserve:', JSBI.toNumber(outputReserve.raw))
-    console.log('inputExponent:', inputExponent)
-    console.log('outputExponent:', outputExponent)
-    console.log('outputAmount', JSBI.toNumber(outputAmount.raw))
+    // console.log('inputReserve:', JSBI.toNumber(inputReserve.raw))
+    // console.log('outputReserve:', JSBI.toNumber(outputReserve.raw))
+    // console.log('inputExponent:', inputExponent)
+    // console.log('outputExponent:', outputExponent)
+    // console.log('outputAmount', JSBI.toNumber(outputAmount.raw))
     const inputDecimals = outputAmount.token.equals(this.token0) ? this.token1.decimals : this.token0.decimals
     const K = JSBI.multiply(
       this.exp(inputReserve.raw, +inputExponent, 100, inputDecimals),
@@ -272,15 +272,15 @@ export class Pair {
         FEES_NUMERATOR
       )
     )
-    console.log(
-      'result:',
-      JSBI.toNumber(
-        JSBI.divide(
-          JSBI.multiply(JSBI.subtract(tmp, JSBI.BigInt(inputReserve.raw)), JSBI.BigInt(FEES_DENOMINATOR)),
-          FEES_NUMERATOR
-        )
-      )
-    )
+    // console.log(
+    //   'result:',
+    //   JSBI.toNumber(
+    //     JSBI.divide(
+    //       JSBI.multiply(JSBI.subtract(tmp, JSBI.BigInt(inputReserve.raw)), JSBI.BigInt(FEES_DENOMINATOR)),
+    //       FEES_NUMERATOR
+    //     )
+    //   )
+    // )
     return [inputAmount, new Pair(inputReserve.add(inputAmount), outputReserve.subtract(outputAmount))]
   }
 

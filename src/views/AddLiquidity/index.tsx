@@ -76,7 +76,7 @@ export default function AddLiquidity() {
 
   const [zapMode] = useZapModeManager()
   const [temporarilyZapMode, setTemporarilyZapMode] = useState(true)
-  const [currencyIdA, currencyIdB] = router.query.currency || ['BNB', CAKE[chainId]?.address]
+  const [currencyIdA, currencyIdB] = router.query.currency || [ETHER.symbol, CAKE[chainId]?.address]
   const [steps, setSteps] = useState(Steps.Choose)
 
   const dispatch = useAppDispatch()

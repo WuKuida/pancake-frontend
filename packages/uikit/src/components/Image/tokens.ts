@@ -619,6 +619,8 @@ const tokens = {
     address: {
       56: "0x2170Ed0880ac9A755fd29B2688956BD959F933F8",
       97: "",
+      1: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+      4: "0x9365BaEec608989AFA12ef7e62d4d7b0C03c72CE",
     },
     decimals: 18,
     projectLink: "https://ethereum.org/en/",
