@@ -173,7 +173,8 @@ export class Pair {
     }
     a = a / 25
     b = b / 25
-    n = JSBI.exponentiate(n, JSBI.BigInt(a))
+    // 扩充到48位
+    n = JSBI.multiply(n, JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(48 - decimal)))
     if (b == 2) {
       n = this.floorSqrt(n)
     } else if (b == 3) {
@@ -181,13 +182,8 @@ export class Pair {
     } else if (b == 4) {
       n = this.floorSqrt(this.floorSqrt(n))
     }
-    if ((decimal * a) / b - decimal > 0) {
-      const bias = Math.round(10 ** ((decimal * a) / b - decimal))
-      return JSBI.divide(n, JSBI.BigInt(bias))
-    } else {
-      const bias = Math.round(1 / 10 ** ((decimal * a) / b - decimal))
-      return JSBI.multiply(n, JSBI.BigInt(bias))
-    }
+    n = JSBI.exponentiate(n, JSBI.BigInt(a))
+    return JSBI.divide(n, JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt((48 * a) / b - decimal)))
   }
 
   // TODO 公式改了需要改这里！！！
@@ -206,6 +202,11 @@ export class Pair {
     console.log('inputExponent:', inputExponent)
     console.log('outputExponent:', outputExponent)
     console.log('inputAmount', JSBI.toNumber(inputAmount.raw))
+    // inputReserve: 133333333333333330
+    // pair.ts?9ea7:206 outputReserve: 100000000000000000
+    // pair.ts?9ea7:207 inputExponent: 100
+    // pair.ts?9ea7:208 outputExponent: 75
+    // pair.ts?9ea7:209 inputAmount 20000000000000
     const inputAmountWithFee = JSBI.divide(JSBI.multiply(inputAmount.raw, FEES_NUMERATOR), FEES_DENOMINATOR)
     const outputDecimals = inputAmount.token.equals(this.token0) ? this.token1.decimals : this.token0.decimals
     const K = JSBI.multiply(
