@@ -62,6 +62,7 @@ export NODE_HOME=/opt/node-v16.15.0-linux-x64
 export PATH=$NODE_HOME/bin:$PATH
 npm install --global yarn
 
+git checkout -b exp origin/exp
 install dependencies using **yarn**
 
 ```sh
