@@ -45,9 +45,9 @@ packages/swap-sdk/src/abis.IPancakePair.json： pair的abi
 
 ### MyTEST
 - WBNB:            0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd
-- PancakeFactory:  0xd736D7D33433Ba8CeeEDC2022b4e44F7c83c98F1
-- INIT_CODE_HASH:  0x2d738a6e5d690a74839138255202b9a25a988507b4c784ab9ee7c27b95386423
-- PancakeRouter:   0x915c78F88789F6F488815B1CB3EBA224BcD7F7b3
+- PancakeFactory:  0xF4B028f9CecC6a64FF14ff6D3e2156f455dA0828
+- INIT_CODE_HASH:  0xdbf8b82900fa01136cde9c900327c6be4f4fb5dc61eb3b0c6d8d0cbf2be0399a
+- PancakeRouter:   0x8d6e1aB69E6c792d098fB362388009f2254E3397
 
 ### ORIGIN_TEST
 - WBNB:            0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd
@@ -104,6 +104,7 @@ yarn start
 - 如果是TEST环境，WBNB不用改，除非是eth
 - 如果是线上环境，搜索 *PRODUCT下的地址，并全部替换成新的地址
 8. 修改添加白名单中的账号
+- 修改factory_address地址
 - 修改addWhite.py中的setter_address和setter_private_key，将其改成工厂合约的owner的地址和密钥
 - 修改addWhite.py的node_url，改成自己的节点，当前节点后续会实效
 9. 部署添加白名单后台服务，记得打开8868端口，支持http/https的请求，并记录当前ip地址
@@ -112,6 +113,7 @@ pip install tornado
 nohup python3 addWhite.py >/dev/null 2>&1 &
 ```
 如果swap请求addwhite，addwhite请求bscscan出现403错误，可能是部署addwhite的服务器ip被bscscan限制访问了，需要换一台服务器重新部署addwhite服务
+同时要注意服务器本身的防火墙有没有开启，限制了访问，有的话记得关掉
 10. 在src/views/AddLiquidity/index.tsx内搜索8868，将前面的ip地址，改称添加白名单后台服务所部署的ip地址
 
 测试：
