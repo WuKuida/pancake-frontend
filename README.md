@@ -111,7 +111,8 @@ yarn start
 pip install tornado
 nohup python3 addWhite.py >/dev/null 2>&1 &
 ```
-13. 在src/views/AddLiquidity/index.tsx内搜索8868，将前面的ip地址，改称添加白名单后台服务所部署的ip地址
+如果swap请求addwhite，addwhite请求bscscan出现403错误，可能是部署addwhite的服务器ip被bscscan限制访问了，需要换一台服务器重新部署addwhite服务
+10. 在src/views/AddLiquidity/index.tsx内搜索8868，将前面的ip地址，改称添加白名单后台服务所部署的ip地址
 
 测试：
 1. 创建一个新的ERC20 token 0x5cD149a8e33B31BFf20Bd7D49a8159D42E6BD419 0xF44e2FdBA41f86c2Ff2f0A447130D8c89697c2b8
