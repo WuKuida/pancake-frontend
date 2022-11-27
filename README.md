@@ -45,9 +45,9 @@ packages/swap-sdk/src/abis.IPancakePair.json： pair的abi
 
 ### MyTEST
 - WBNB:            0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd
-- PancakeFactory:  0xF4B028f9CecC6a64FF14ff6D3e2156f455dA0828
-- INIT_CODE_HASH:  0xdbf8b82900fa01136cde9c900327c6be4f4fb5dc61eb3b0c6d8d0cbf2be0399a
-- PancakeRouter:   0x8d6e1aB69E6c792d098fB362388009f2254E3397
+- PancakeFactory:  0xd123586c8474cd2C71D14b170bB44C4B373Cb85e
+- INIT_CODE_HASH:  0xa9d927a40e44135c3fb9e4103268cd5023c5f6e1961bc7ce309eb24b969abe67
+- PancakeRouter:   0xf7D2e7fD0660e8A4e5feA38fB0730D36b86e086a
 
 ### ORIGIN_TEST
 - WBNB:            0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd
