@@ -138,21 +138,21 @@ export function useDerivedMintInfo(
         const [tokenA, tokenB] = [wrappedCurrency(currencyA, chainId), wrappedCurrency(currencyB, chainId)]
         if (tokenA && tokenB && wrappedIndependentAmount) {
           const dependentCurrency = dependentField === Field.CURRENCY_B ? currencyB : currencyA
-          // TODO 改公式要改这里！！！
+          // exp diff
           const dependentTokenAmount =
             dependentField === Field.CURRENCY_B
               ? new TokenAmount(
                   tokenB,
                   wrappedIndependentAmount
-                    .multiply('3')
-                    .divide('4')
+                    .multiply('1')
+                    .divide('2')
                     .multiply(+customPrice * 10 ** tokenB.decimals).quotient,
                 )
               : new TokenAmount(
                   tokenA,
                   wrappedIndependentAmount
-                    .multiply(4 * 10 ** (tokenA.decimals + 9))
-                    .divide('3')
+                    .multiply(2 * 10 ** (tokenA.decimals + 9))
+                    .divide('1')
                     .divide(+customPrice * 1000000000).quotient,
                 )
           return dependentCurrency === ETHER ? CurrencyAmount.ether(dependentTokenAmount.raw) : dependentTokenAmount

@@ -186,7 +186,6 @@ export class Pair {
     return JSBI.divide(n, JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt((48 * a) / b - decimal)))
   }
 
-  // TODO 公式改了需要改这里！！！
   public getOutputAmount(inputAmount: TokenAmount): [TokenAmount, Pair] {
     invariant(this.involvesToken(inputAmount.token), 'TOKEN')
     if (JSBI.equal(this.reserve0.raw, ZERO) || JSBI.equal(this.reserve1.raw, ZERO)) {
@@ -231,7 +230,6 @@ export class Pair {
     return [outputAmount, new Pair(inputReserve.add(inputAmount), outputReserve.subtract(outputAmount))]
   }
 
-  // TODO 公式改了需要改这里！！！
   public getInputAmount(outputAmount: TokenAmount): [TokenAmount, Pair] {
     invariant(this.involvesToken(outputAmount.token), 'TOKEN')
     if (
@@ -246,11 +244,11 @@ export class Pair {
     const inputReserve = this.reserveOf(outputAmount.token.equals(this.token0) ? this.token1 : this.token0)
     const outputExponent = this.exponentOf(outputAmount.token)
     const inputExponent = this.exponentOf(outputAmount.token.equals(this.token0) ? this.token1 : this.token0)
-    console.log('inputReserve:', JSBI.toNumber(inputReserve.raw))
-    console.log('outputReserve:', JSBI.toNumber(outputReserve.raw))
-    console.log('inputExponent:', inputExponent)
-    console.log('outputExponent:', outputExponent)
-    console.log('outputAmount', JSBI.toNumber(outputAmount.raw))
+    // console.log('inputReserve:', JSBI.toNumber(inputReserve.raw))
+    // console.log('outputReserve:', JSBI.toNumber(outputReserve.raw))
+    // console.log('inputExponent:', inputExponent)
+    // console.log('outputExponent:', outputExponent)
+    // console.log('outputAmount', JSBI.toNumber(outputAmount.raw))
     const inputDecimals = outputAmount.token.equals(this.token0) ? this.token1.decimals : this.token0.decimals
     const K = JSBI.multiply(
       this.exp(inputReserve.raw, +inputExponent, 100, inputDecimals),

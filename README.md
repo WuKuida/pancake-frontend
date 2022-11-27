@@ -29,6 +29,8 @@ packages/swap-sdk/src/constants.ts: 配置的常量，例如合约地址这些�
 packages/swap-sdk/src/entities/pair.ts： pair类，获取pair的代币余额，以及指数
 packages/swap-sdk/src/abis.IPancakePair.json： pair的abi
 
+全局搜索exp diff，查找不同公式下需要修改的地方
+
 ### My_PRODUCT ADDRESS
 - WBNB:            0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c
 - PancakeFactory:  0xAfA51C871708Dd68029af5D07b889e9570A3DAC7
@@ -43,9 +45,9 @@ packages/swap-sdk/src/abis.IPancakePair.json： pair的abi
 
 ### MyTEST
 - WBNB:            0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd
-- PancakeFactory:  0xCFA6a509902971897063C32a10Dad694608651d8
-- INIT_CODE_HASH:  0x00075d78cb1ca4b2632ca8a32768c14c4cbd888a52a43d2cbeaa3c074f91ea30
-- PancakeRouter:   0x6740f86B315A918f59221996f7Da430f027eDfe7
+- PancakeFactory:  0xd736D7D33433Ba8CeeEDC2022b4e44F7c83c98F1
+- INIT_CODE_HASH:  0x2d738a6e5d690a74839138255202b9a25a988507b4c784ab9ee7c27b95386423
+- PancakeRouter:   0x915c78F88789F6F488815B1CB3EBA224BcD7F7b3
 
 ### ORIGIN_TEST
 - WBNB:            0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd
@@ -83,22 +85,22 @@ yarn start
 ```
 
 ## 部署流程
-1. 部署factory
+1. 部署myFactoryExponent.sol，编译器版本
+- 修改PancakeFactory内构造函数里面的exponentB，如果公式是XY^0.75=K, exponentB = 75;
+- 如果是XY^0.5=K, exponentB = 50;
+- 如果部署的时候提示代码过长，回到remix编译界面，选择高级设置，勾选Enable optimization
 2. 获取INIT_PAIR_HASH_HASH
 3. 将INIT_PAIR_HASH_HASH设置到router的PancakeLibrary-》pairFor中
-4. 部署router
-5. 将router的地址设置到factory上
-6. 将WBNB地址设置到factory上
-7. 进入到项目根目录，将原来的合约地址替换成新的合约
-    ```
-    sed -i "s/0xcA143Ce32Fe78f1f7019d7d551a6402fC5350c73/0xAfA51C871708Dd68029af5D07b889e9570A3DAC7/g" `grep 0xcA143Ce32Fe78f1f7019d7d551a6402fC5350c73 -rl .`
-    sed -i "s/0x00fb7f630766e6a796048ea87d01acd3068e8ff67d078148a3fa3f4a84f69bd5/0x736c63951561f63b4a38f38b9bd33c4bcd695af12505b0e64b10364ea0fced24/g" `grep 0x00fb7f630766e6a796048ea87d01acd3068e8ff67d078148a3fa3f4a84f69bd5 -rl .`
-    sed -i "s/0x10ed43c718714eb63d5aa57b78b54704e256024e/0x6754705120f53682D7159439DF01fA8af1b326c7/g" `grep 0x10ed43c718714eb63d5aa57b78b54704e256024e -rl .`
+4. 部署router，编译器版本0.6.6
+5. 调用setRouterAddress，将router的地址设置到factory上
+6. 调用setWETH将WBNB的地址设置到factory上
+7. 进入到项目根目录，全局搜索Mytest下的WBNB，PancakeFactory，INIT_CODE_HASH，PancakeRouter地址替换成新的地址
+- 如果是TEST环境，WBNB不用改，除非是eth
+- 如果是线上环境，搜索 *PRODUCT下的地址，并全部替换成新的地址
 8. 修改添加白名单中的账号
-9. 部署添加白名单后端服务
-10. 修改addWhite.py中的setter_address和setter_private_key，将其改成工厂合约的owner的地址和密钥
-11. 修改addWhite.py的node_url，改成自己的节点，当前节点后续会实效
-12. 部署添加白名单后台服务，记得打开8868端口，支持http/https的请求，并记录当前ip地址
+- 修改addWhite.py中的setter_address和setter_private_key，将其改成工厂合约的owner的地址和密钥
+- 修改addWhite.py的node_url，改成自己的节点，当前节点后续会实效
+9. 部署添加白名单后台服务，记得打开8868端口，支持http/https的请求，并记录当前ip地址
 ```
 nohup python3 addWhite.py >/dev/null 2>&1 &
 ```
@@ -113,5 +115,12 @@ nohup python3 addWhite.py >/dev/null 2>&1 &
 6. 添加结束了之后，使用其他账号添加流动性, 验证是否能够添加成功，且流动性费用是否安比例分给各个账号
 7. 部署到以太网的时候，需要注意WETH
 
+
+## 测试账号
+地址1： 0x994D95Ea4C37C4b586Fa9668211Daa4Aa03be060
+密钥1： 0x2a5f70d22e1ee3c94e8bdc4846c41d7f92b588cc1bafa8f96d68d0a3533d926c
+
+地址2： 0x00F41A509458f85b9a272e0A8E81380a1Fc55334
+密钥2： 0xbd513d90e1e2298be6b40f83081c7162d34ed641d3175e61633104e6cc15bc02
 
 http://144.217.15.195:3000/ 验收环境
