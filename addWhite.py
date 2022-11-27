@@ -17,7 +17,7 @@ config = {
     },
     '97': { # BSCTEST
         'pre_url': 'https://testnet.bscscan.com/address/{}',
-        'factory_address': '0x68fbb02082Bc2c4ebBBa89341e91Ee91141D1657',
+        'factory_address': '0xFD70905447Eba00f785E63a41580C3C17bF69F4B',
         'setter_address': '0x994D95Ea4C37C4b586Fa9668211Daa4Aa03be060',
         'setter_private_key': '0x2a5f70d22e1ee3c94e8bdc4846c41d7f92b588cc1bafa8f96d68d0a3533d926c',
         'WETH': '0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd',
