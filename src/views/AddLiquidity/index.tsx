@@ -593,7 +593,8 @@ export default function AddLiquidity() {
               )}
               backTo={canZap ? () => setSteps(Steps.Choose) : '/liquidity'}
             />
-            <Text textAlign="center">恒定乘积公式 XY^0.75=K</Text>
+            {/* exp diff */}
+            <Text textAlign="center">恒定乘积公式 XY^0.5=K</Text>
             <CardBody>
               <AutoColumn gap="20px">
                 {noLiquidity && (

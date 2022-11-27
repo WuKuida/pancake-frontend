@@ -59,13 +59,19 @@ packages/swap-sdk/src/abis.IPancakePair.json： pair的abi
 1. 需要安装nodejs，yarn，以下安装方式作为参考意见
 [nodejs](https://nodejs.org/en/download/)
 ```
-tar -xvJf node-v16.15.0-linux-x64.tar.xz
-export NODE_HOME=/opt/node-v16.15.0-linux-x64
+wget https://nodejs.org/dist/v18.12.1/node-v18.12.1-linux-x64.tar.xz
+tar -xvJf node-v18.12.1-linux-x64.tar.xz
+mv node-v18.12.1-linux-x64 /opt/node
+cat >>~/.bashrc
+export NODE_HOME=/opt/node
 export PATH=$NODE_HOME/bin:$PATH
+source ~/.bashrc
 npm install --global yarn
 
+git clone项目并且切换到对应分支
 git checkout -b exp origin/exp
-install dependencies using **yarn**
+git checkout -b exp0.5 origin/exp0.5
+
 
 ```sh
 yarn
@@ -85,7 +91,7 @@ yarn start
 ```
 
 ## 部署流程
-1. 部署myFactoryExponent.sol，编译器版本
+1. 部署myFactoryExponent.sol，编译器版本0.5.16
 - 修改PancakeFactory内构造函数里面的exponentB，如果公式是XY^0.75=K, exponentB = 75;
 - 如果是XY^0.5=K, exponentB = 50;
 - 如果部署的时候提示代码过长，回到remix编译界面，选择高级设置，勾选Enable optimization
@@ -102,6 +108,7 @@ yarn start
 - 修改addWhite.py的node_url，改成自己的节点，当前节点后续会实效
 9. 部署添加白名单后台服务，记得打开8868端口，支持http/https的请求，并记录当前ip地址
 ```
+pip install tornado
 nohup python3 addWhite.py >/dev/null 2>&1 &
 ```
 13. 在src/views/AddLiquidity/index.tsx内搜索8868，将前面的ip地址，改称添加白名单后台服务所部署的ip地址
