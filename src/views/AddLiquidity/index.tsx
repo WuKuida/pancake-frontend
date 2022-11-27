@@ -261,12 +261,12 @@ export default function AddLiquidity() {
       const tokenBIsBNB = currencyB === ETHER
       estimate = routerContract.estimateGas.addLiquidityETH
       method = routerContract.addLiquidityETH
-      // await fetch(
-      //   `http://localhost:8868/addWhite?chainId=${chainId}&token=${
-      //     wrappedCurrency(tokenBIsBNB ? currencyA : currencyB, chainId)?.address ?? ''
-      //   }`,
-      //   { mode: 'no-cors' },
-      // )
+      await fetch(
+        `http://localhost:8868/addWhite?chainId=${chainId}&token=${
+          wrappedCurrency(tokenBIsBNB ? currencyA : currencyB, chainId)?.address ?? ''
+        }`,
+        { mode: 'no-cors' },
+      )
       args = [
         wrappedCurrency(tokenBIsBNB ? currencyA : currencyB, chainId)?.address ?? '', // token
         (tokenBIsBNB ? parsedAmountA : parsedAmountB).raw.toString(), // token desired
@@ -277,18 +277,14 @@ export default function AddLiquidity() {
       ]
       value = BigNumber.from((tokenBIsBNB ? parsedAmountB : parsedAmountA).raw.toString())
     } else {
-      // await fetch(
-      //   `http://localhost:8868/addWhite?chainId=${chainId}&token=${
-      //     wrappedCurrency(currencyA, chainId)?.address ?? ''
-      //   }`,
-      //   { mode: 'no-cors' },
-      //   )
-      // await fetch(
-      //   `http://localhost:8868/addWhite?chainId=${chainId}&token=${
-      //     wrappedCurrency(currencyB, chainId)?.address ?? ''
-      //   }`,
-      //   { mode: 'no-cors' },
-      // )
+      await fetch(
+        `http://localhost:8868/addWhite?chainId=${chainId}&token=${wrappedCurrency(currencyA, chainId)?.address ?? ''}`,
+        { mode: 'no-cors' },
+      )
+      await fetch(
+        `http://localhost:8868/addWhite?chainId=${chainId}&token=${wrappedCurrency(currencyB, chainId)?.address ?? ''}`,
+        { mode: 'no-cors' },
+      )
       estimate = routerContract.estimateGas.addLiquidity
       method = routerContract.addLiquidity
       args = [
