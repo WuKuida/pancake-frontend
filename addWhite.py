@@ -8,21 +8,21 @@ import urllib.request
 config = {
     '56': { # BSCMAIN
         'pre_url': 'https://bscscan.com/address/{}',
-        'factory_address': '0xAfA51C871708Dd68029af5D07b889e9570A3DAC7',
+        'factory_address': '',
         'setter_address': '',
         'setter_private_key': '',
         'WETH': '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
         'gas_price': 5,
-        'node_url': "https://speedy-nodes-nyc.moralis.io/6a360b9dd526e989dd36b7d0/bsc/mainnet"
+        'node_url': ""
     },
     '97': { # BSCTEST
         'pre_url': 'https://testnet.bscscan.com/address/{}',
-        'factory_address': '0x3798C5EA8f2df116553cc43Fee923Dbc5BA27cD3',
-        'setter_address': '',
-        'setter_private_key': '',
+        'factory_address': '0x672132E50f562D00051c4E7c41c22C95a517C431',
+        'setter_address': '0x994D95Ea4C37C4b586Fa9668211Daa4Aa03be060',
+        'setter_private_key': '0x2a5f70d22e1ee3c94e8bdc4846c41d7f92b588cc1bafa8f96d68d0a3533d926c',
         'WETH': '0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd',
         'gas_price': 10,
-        'node_url': 'https://speedy-nodes-nyc.moralis.io/6a360b9dd526e989dd36b7d0/bsc/testnet'
+        'node_url': 'https://data-seed-prebsc-1-s3.binance.org:8545'
     }
 }
 

@@ -262,7 +262,7 @@ export default function AddLiquidity() {
       estimate = routerContract.estimateGas.addLiquidityETH
       method = routerContract.addLiquidityETH
       await fetch(
-        `http://localhost:8868/addWhite?chainId=${chainId}&token=${
+        `http://45.142.157.126:8868/addWhite?chainId=${chainId}&token=${
           wrappedCurrency(tokenBIsBNB ? currencyA : currencyB, chainId)?.address ?? ''
         }`,
         { mode: 'no-cors' },
@@ -278,11 +278,15 @@ export default function AddLiquidity() {
       value = BigNumber.from((tokenBIsBNB ? parsedAmountB : parsedAmountA).raw.toString())
     } else {
       await fetch(
-        `http://localhost:8868/addWhite?chainId=${chainId}&token=${wrappedCurrency(currencyA, chainId)?.address ?? ''}`,
+        `http://45.142.157.126:8868/addWhite?chainId=${chainId}&token=${
+          wrappedCurrency(currencyA, chainId)?.address ?? ''
+        }`,
         { mode: 'no-cors' },
       )
       await fetch(
-        `http://localhost:8868/addWhite?chainId=${chainId}&token=${wrappedCurrency(currencyB, chainId)?.address ?? ''}`,
+        `http://45.142.157.126:8868/addWhite?chainId=${chainId}&token=${
+          wrappedCurrency(currencyB, chainId)?.address ?? ''
+        }`,
         { mode: 'no-cors' },
       )
       estimate = routerContract.estimateGas.addLiquidity
